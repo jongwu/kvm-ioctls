@@ -1330,6 +1330,8 @@ impl VcpuFd {
                 r => panic!("unknown kvm exit reason: {}", r),
             }
         } else {
+            let regs = self.get_regs();
+            println!("dump register: {?:}", regs);
             Err(errno::Error::last())
         }
     }
