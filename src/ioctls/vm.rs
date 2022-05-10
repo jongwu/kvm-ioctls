@@ -1043,14 +1043,16 @@ impl VmFd {
         #[allow(clippy::cast_lossless)]
         let vcpu_fd = unsafe { ioctl_with_val(&self.vm, KVM_CREATE_VCPU(), id as c_ulong) };
         if vcpu_fd < 0 {
+		println!("--------- kvm-ioctls: create_vcpu: fail to create vcpu ---------\n");
             return Err(errno::Error::last());
         }
 
         // Wrap the vCPU now in case the following ? returns early. This is safe because we verified
         // the value of the fd and we own the fd.
         let vcpu = unsafe { File::from_raw_fd(vcpu_fd) };
-
+	println!("--------kvm-ioctls: create_vcpu: before mmap_from_fd --------\n");
         let kvm_run_ptr = KvmRunWrapper::mmap_from_fd(&vcpu, self.run_size)?;
+	println!("--------kvm-ioctls: create_vcpu: after mmap_from_fd --------\n");
 
         Ok(new_vcpu(vcpu, kvm_run_ptr))
     }
